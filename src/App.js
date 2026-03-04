@@ -1,23 +1,37 @@
-import logo from './logo.svg';
+import React, { useState } from 'react';
 import './App.css';
+import "@excalidraw/excalidraw/index.css";
+import { Excalidraw } from "@excalidraw/excalidraw";
+import TopBar from './components/TopBar.tsx';
 
 function App() {
+  const [excalidrawAPI, setExcalidrawAPI] = useState(null);
+  const [lastEdited] = useState(Date.now());
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="App" style={{ height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      <TopBar
+        fileName="My Design"
+        lastEdited={lastEdited}
+        excalidrawAPI={excalidrawAPI}
+      />
+
+      <main style={{ flex: 1, height: "100%", width: "100%", position: "relative" }}>
+        <Excalidraw
+          excalidrawAPI={(api) => setExcalidrawAPI(api)}
+          UIOptions={{
+            canvasActions: {
+              loadScene: false,
+              saveToActiveFile: false,
+              export: false,
+              saveAsImage: false,
+              clearCanvas: false,
+              changeViewBackgroundColor: false,
+              toggleTheme: false,
+            },
+          }}
+        />
+      </main>
     </div>
   );
 }
