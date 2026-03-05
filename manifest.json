@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "A React plugin with canvas drawing using Excali-plugin",
   "fileType": "excali-plugin",
-  "route": "/excali-plugin/:file_id",
+  "route": "/excali-plugin",
   "entry": "/build/index.html",
   "icon": "public/Icons.svg"
 }

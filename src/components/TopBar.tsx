@@ -136,13 +136,6 @@ const TopBar: React.FC<Props> = ({ fileName, lastEdited, excalidrawAPI }) => {
           onBackgroundChange={handleBackground}
         />
       </div>
-
-      {showExportModal && (
-        <ExportModal
-          excalidrawAPI={excalidrawAPI}
-          onClose={() => setShowExportModal(false)}
-        />
-      )}
     </header>
   );
 };
