@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { createPortal } from "react-dom";
 import { exportToBlob } from "@excalidraw/excalidraw";
+import "./excalidraw-menu.css";
 
 interface Props {
   excalidrawAPI: any;
@@ -75,224 +76,76 @@ const ExportModal = ({ excalidrawAPI, onClose }: Props) => {
     }
   };
 
-  return createPortal(
-    <div
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100vw",
-        height: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 999999,
-      }}
-    >
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: "rgba(0,0,0,0.6)",
-        }}
-        onClick={onClose}
-      />
-      <div
-        style={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          zIndex: 1001,
-          width: "100%",
-          maxWidth: "400px",
-          padding: "24px",
-          backgroundColor: "white",
-          borderRadius: "12px",
-          boxShadow:
-            "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-          color: "#111827",
-          fontFamily:
-            'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-        }}
-      >
-        <h3
-          style={{
-            marginTop: 0,
-            fontSize: "1.25rem",
-            fontWeight: 600,
-            marginBottom: "20px",
-          }}
-        >
-          Export image
-        </h3>
+  return (
+    <>
+      {createPortal(
+        <div className="modal-overlay">
+          <div className="modal dropdown-menu">
+            <h3>Export image</h3>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <label style={{ fontSize: "0.95rem", fontWeight: 500 }}>
-              Background
-            </label>
             <div
-              style={{
-                width: "36px",
-                height: "20px",
-                backgroundColor: withBg ? "#6965db" : "#d1d5db",
-                borderRadius: "10px",
-                display: "flex",
-                alignItems: "center",
-                cursor: "pointer",
-                padding: "2px",
-                transition: "all 0.2s",
-              }}
-              onClick={() => setWithBg(!withBg)}
+              style={{ display: "flex", flexDirection: "column", gap: "16px" }}
             >
-              <div
-                style={{
-                  width: "16px",
-                  height: "16px",
-                  backgroundColor: "white",
-                  borderRadius: "50%",
-                  transform: withBg ? "translateX(16px)" : "translateX(0)",
-                  transition: "transform 0.2s",
-                }}
-              />
+              <div className="setting">
+                <label>Background</label>
+                <div
+                  className={`Switch ${withBg ? "toggled" : ""}`}
+                  onClick={() => setWithBg(!withBg)}
+                >
+                  <div className="thumb" />
+                </div>
+              </div>
+
+              <div className="setting">
+                <label>Dark mode</label>
+                <div
+                  className={`Switch ${darkMode ? "toggled" : ""}`}
+                  onClick={() => setDarkMode(!darkMode)}
+                >
+                  <div className="thumb" />
+                </div>
+              </div>
+
+              <div className="setting">
+                <label>Embed scene</label>
+                <div
+                  className={`Switch ${embedScene ? "toggled" : ""}`}
+                  onClick={() => setEmbedScene(!embedScene)}
+                >
+                  <div className="thumb" />
+                </div>
+              </div>
+
+              <div className="modal-actions">
+                <button
+                  className="btn-primary"
+                  onClick={() => exportImage("png")}
+                >
+                  PNG
+                </button>
+                <button
+                  className="btn-primary"
+                  onClick={() => exportImage("svg")}
+                >
+                  SVG
+                </button>
+                <button className="btn-secondary" onClick={copyToClipboard}>
+                  Copy to Clipboard
+                </button>
+              </div>
+              <button
+                className="btn-secondary"
+                style={{ marginTop: "8px" }}
+                onClick={onClose}
+              >
+                Cancel
+              </button>
             </div>
           </div>
-
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <label style={{ fontSize: "0.95rem", fontWeight: 500 }}>
-              Dark mode
-            </label>
-            <div
-              style={{
-                width: "36px",
-                height: "20px",
-                backgroundColor: darkMode ? "#6965db" : "#d1d5db",
-                borderRadius: "10px",
-                display: "flex",
-                alignItems: "center",
-                cursor: "pointer",
-                padding: "2px",
-                transition: "all 0.2s",
-              }}
-              onClick={() => setDarkMode(!darkMode)}
-            >
-              <div
-                style={{
-                  width: "16px",
-                  height: "16px",
-                  backgroundColor: "white",
-                  borderRadius: "50%",
-                  transform: darkMode ? "translateX(16px)" : "translateX(0)",
-                  transition: "transform 0.2s",
-                }}
-              />
-            </div>
-          </div>
-
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <label style={{ fontSize: "0.95rem", fontWeight: 500 }}>
-              Embed scene
-            </label>
-            <div
-              style={{
-                width: "36px",
-                height: "20px",
-                backgroundColor: embedScene ? "#6965db" : "#d1d5db",
-                borderRadius: "10px",
-                display: "flex",
-                alignItems: "center",
-                cursor: "pointer",
-                padding: "2px",
-                transition: "all 0.2s",
-              }}
-              onClick={() => setEmbedScene(!embedScene)}
-            >
-              <div
-                style={{
-                  width: "16px",
-                  height: "16px",
-                  backgroundColor: "white",
-                  borderRadius: "50%",
-                  transform: embedScene ? "translateX(16px)" : "translateX(0)",
-                  transition: "transform 0.2s",
-                }}
-              />
-            </div>
-          </div>
-
-          <div style={{ display: "flex", gap: "10px", marginTop: "12px" }}>
-            <button
-              style={{
-                flex: 1,
-                padding: "10px",
-                backgroundColor: "#e3e2fe",
-                color: "#6965db",
-                border: "none",
-                borderRadius: "8px",
-                fontWeight: 600,
-                cursor: "pointer",
-              }}
-              onClick={() => exportImage("png")}
-            >
-              PNG
-            </button>
-            <button
-              style={{
-                flex: 1,
-                padding: "10px",
-                backgroundColor: "#e3e2fe",
-                color: "#6965db",
-                border: "none",
-                borderRadius: "8px",
-                fontWeight: 600,
-                cursor: "pointer",
-              }}
-              onClick={() => exportImage("svg")}
-            >
-              SVG
-            </button>
-            <button
-              style={{
-                flex: 1,
-                padding: "10px",
-                backgroundColor: "#f3f4f6",
-                color: "#374151",
-                border: "none",
-                borderRadius: "8px",
-                fontWeight: 600,
-                cursor: "pointer",
-              }}
-              onClick={copyToClipboard}
-            >
-              Copy
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>,
-    document.body,
+        </div>,
+        document.body,
+      )}
+    </>
   );
 };
 

@@ -136,35 +136,46 @@ function App() {
   };
 
   return (
-    <div className="App" style={{ height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+    <div className="App" style={{ height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden", backgroundColor: "#f9fafb" }}>
       <TopBar
+        fileId={fileId}
         fileName={fileName}
         lastEdited={lastEdited}
         excalidrawAPI={excalidrawAPI}
+        onRename={async (newName) => {
+          try {
+            await window.pluginAPI.updateFileName(fileId, newName);
+            setFileName(newName);
+          } catch (error) {
+            console.error("Rename error:", error);
+          }
+        }}
       />
 
-      <main style={{ flex: 1, height: "100%", width: "100%", position: "relative" }}>
-        {!isContentLoading ? (
-          <Excalidraw
-            excalidrawAPI={(api) => setExcalidrawAPI(api)}
-            initialData={initialData}
-            UIOptions={{
-              canvasActions: {
-                loadScene: false,
-                saveToActiveFile: false,
-                export: false,
-                saveAsImage: false,
-                clearCanvas: false,
-                changeViewBackgroundColor: false,
-                toggleTheme: false,
-              },
-            }}
-          />
-        ) : (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-            Loading canvas...
-          </div>
-        )}
+      <main style={{ flex: 1, height: "100%", width: "100%", position: "relative", }}>
+        <div style={{ height: "100%", width: "100%", overflow: "hidden" }}>
+          {!isContentLoading ? (
+            <Excalidraw
+              excalidrawAPI={(api) => setExcalidrawAPI(api)}
+              initialData={initialData}
+              UIOptions={{
+                canvasActions: {
+                  loadScene: false,
+                  saveToActiveFile: false,
+                  export: false,
+                  saveAsImage: false,
+                  clearCanvas: false,
+                  changeViewBackgroundColor: false,
+                  toggleTheme: false,
+                },
+              }}
+            />
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+              Loading canvas...
+            </div>
+          )}
+        </div>
       </main>
     </div>
   );
