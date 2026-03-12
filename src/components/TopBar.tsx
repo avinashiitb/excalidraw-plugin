@@ -10,6 +10,7 @@ interface Props {
   fileName: string;
   lastEdited: number;
   excalidrawAPI: any;
+  fileData: any;
   onRename: (newName: string) => void;
 }
 
@@ -18,6 +19,7 @@ const TopBar: React.FC<Props> = ({
   fileName,
   lastEdited,
   excalidrawAPI,
+  fileData,
   onRename,
 }) => {
   const [showExportModal, setShowExportModal] = useState(false);
@@ -65,13 +67,47 @@ const TopBar: React.FC<Props> = ({
     const appState = excalidrawAPI.getAppState();
     const files = excalidrawAPI.getFiles();
     const exportData = { elements, appState, files };
-    const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+    const finalJson = JSON.stringify(exportData, null, 2);
+    const blob = new Blob([finalJson], {
       type: "application/json",
     });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
     a.download = `${fileName}.excalidraw`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportDS = () => {
+    if (!excalidrawAPI) return;
+    const elements = excalidrawAPI.getSceneElements();
+    const appState = excalidrawAPI.getAppState();
+    const files = excalidrawAPI.getFiles();
+
+    const exportData = {
+      _id: fileData?._id || "",
+      version: 1,
+      time: Date.now(),
+      parent_file: fileId,
+      blocks: [
+        {
+          type: "excalidraw",
+          data: { elements, appState, files },
+        },
+      ],
+      createdAt: fileData?.createdAt || Date.now(),
+      updatedAt: fileData?.updatedAt || Date.now(),
+      fileType: "excalidraw-plugin",
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${fileName}.ds`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -189,17 +225,18 @@ const TopBar: React.FC<Props> = ({
           onExportClick={() => setShowExportModal(true)}
           onLoad={handleLoad}
           onSaveJSON={handleSaveJSON}
+          onExportDS={handleExportDS}
           onClear={handleClear}
           onBackgroundChange={handleBackground}
         />
       </div>
 
-      {/* {showExportModal && (
+      {showExportModal && (
         <ExportModal
           excalidrawAPI={excalidrawAPI}
           onClose={() => setShowExportModal(false)}
         />
-      )} */}
+      )}
     </header>
   );
 };

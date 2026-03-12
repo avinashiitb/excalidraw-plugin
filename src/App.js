@@ -142,6 +142,7 @@ function App() {
         fileName={fileName}
         lastEdited={lastEdited}
         excalidrawAPI={excalidrawAPI}
+        fileData={content}
         onRename={async (newName) => {
           try {
             await window.pluginAPI.updateFileName(fileId, newName);

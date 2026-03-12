@@ -12,6 +12,7 @@ interface Props {
   onExportClick: () => void;
   onLoad: () => void;
   onSaveJSON: () => void;
+  onExportDS: () => void;
   onClear: () => void;
   onBackgroundChange: (color: string) => void;
 }
@@ -22,6 +23,7 @@ const ExcalidrawMenu: React.FC<Props> = ({
   onExportClick,
   onLoad,
   onSaveJSON,
+  onExportDS,
   onClear,
   onBackgroundChange,
 }) => {
@@ -63,111 +65,160 @@ const ExcalidrawMenu: React.FC<Props> = ({
       </button>
 
       {open && (
-        <div
-          style={{
-            position: "absolute",
-            right: 0,
-            marginTop: "8px",
-            width: "220px",
-            backgroundColor: "white",
-            borderRadius: "8px",
-            boxShadow: "var(--modal-shadow)",
-            border: "1px solid #e5e7eb",
-            zIndex: 1000,
-            padding: "4px",
-          }}
-        >
-          <div className="menu-section">
-            <div className="menu-label">Canvas Options</div>
+        <div className="absolute right-4 mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-10">
+          <div className="py-1">
+            <div className="px-3 py-2 text-xs font-medium text-gray-500">
+              Canvas Options
+            </div>
             <button
-              className="dropdown-item"
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2"
+              style={{
+                display: "flex",
+                width: "100%",
+                backgroundColor: "transparent",
+                border: "none",
+                cursor: "pointer",
+                borderRadius: "0px",
+              }}
               onClick={() => {
                 onLoad();
                 setOpen(false);
               }}
             >
-              <FolderOpenIcon
-                style={{ fontSize: "1.1rem", color: "#3b82f6" }}
-              />
-              Open
+              <i className="fas fa-folder-open text-blue-500"></i>
+              <span>Open</span>
             </button>
             <button
-              className="dropdown-item"
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2"
+              style={{
+                display: "flex",
+                width: "100%",
+                backgroundColor: "transparent",
+                border: "none",
+                cursor: "pointer",
+                borderRadius: "0px",
+              }}
               onClick={() => {
                 onSaveJSON();
                 setOpen(false);
               }}
             >
-              <SaveIcon style={{ fontSize: "1.1rem", color: "#10b981" }} />
-              Save to...
+              <i className="fas fa-save text-green-600"></i>
+              <span>Save to...</span>
             </button>
-          </div>
 
-          <div
-            style={{
-              height: "1px",
-              backgroundColor: "#f3f4f6",
-              margin: "4px 8px",
-            }}
-          />
+            <div
+              style={{
+                borderTop: "1px solid rgb(229, 231, 235)",
+                margin: "4px auto",
+                width: "85%",
+              }}
+            ></div>
 
-          <div className="menu-section">
-            <div className="menu-label">Export</div>
+            <div className="px-3 py-2 text-xs font-medium text-gray-500">
+              Export Options
+            </div>
             <button
-              className="dropdown-item"
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2"
+              style={{
+                display: "flex",
+                width: "100%",
+                backgroundColor: "transparent",
+                border: "none",
+                cursor: "pointer",
+                borderRadius: "0px",
+              }}
+              onClick={() => {
+                onExportDS();
+                setOpen(false);
+              }}
+            >
+              <i className="fas fa-file-alt text-blue-600"></i>
+              <span>Devscribe(.ds)</span>
+            </button>
+            <button
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2"
+              style={{
+                display: "flex",
+                width: "100%",
+                backgroundColor: "transparent",
+                border: "none",
+                cursor: "pointer",
+                borderRadius: "0px",
+              }}
               onClick={() => {
                 onExportClick();
                 setOpen(false);
               }}
             >
-              <ImageIcon style={{ fontSize: "1.1rem", color: "#8b5cf6" }} />
-              Export Image
+              <i className="fas fa-image text-purple-600"></i>
+              <span>Export Image</span>
             </button>
-          </div>
 
-          <div
-            style={{
-              height: "1px",
-              backgroundColor: "#f3f4f6",
-              margin: "4px 8px",
-            }}
-          />
+            <div
+              style={{
+                borderTop: "1px solid rgb(229, 231, 235)",
+                margin: "4px auto",
+                width: "85%",
+              }}
+            ></div>
 
-          <div className="menu-section">
-            <div className="menu-label">Background</div>
-            <div className="color-row">
-              {COLORS.map((c) => (
-                <button
-                  key={c}
-                  className="color-btn"
-                  style={{ background: c }}
-                  onClick={() => onBackgroundChange(c)}
-                  title={`Background: ${c}`}
-                />
-              ))}
-            </div>
-          </div>
-
-          <div
-            style={{
-              height: "1px",
-              backgroundColor: "#f3f4f6",
-              margin: "4px 8px",
-            }}
-          />
-
-          <div className="menu-section">
             <button
-              className="dropdown-item"
-              style={{ color: "#dc2626" }}
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-red-50 flex items-center space-x-2"
+              style={{
+                display: "flex",
+                width: "100%",
+                backgroundColor: "transparent",
+                border: "none",
+                cursor: "pointer",
+                borderRadius: "0px",
+                color: "rgb(220, 38, 38)",
+              }}
               onClick={() => {
                 onClear();
                 setOpen(false);
               }}
             >
-              <DeleteIcon style={{ fontSize: "1.1rem" }} />
-              Clear Canvas
+              <i className="fas fa-trash-alt"></i>
+              <span>Clear Canvas</span>
             </button>
+
+            <div
+              style={{
+                borderTop: "1px solid rgb(229, 231, 235)",
+                margin: "4px auto",
+                width: "85%",
+              }}
+            ></div>
+
+            <div className="px-3 py-2 text-xs font-medium text-gray-500">
+              Canvas Background
+            </div>
+            <div className="px-4 py-2 flex gap-2">
+              {COLORS.map((c) => (
+                <button
+                  key={c}
+                  title={`Background: ${c}`}
+                  style={{
+                    width: "24px",
+                    height: "24px",
+                    borderRadius: "50%",
+                    border: "1px solid rgb(209, 213, 219)",
+                    background: c,
+                    cursor: "pointer",
+                  }}
+                  onClick={() => onBackgroundChange(c)}
+                ></button>
+              ))}
+            </div>
+
+            <div
+              style={{
+                borderTop: "1px solid rgb(229, 231, 235)",
+                margin: "4px auto",
+                width: "85%",
+              }}
+            ></div>
           </div>
         </div>
       )}
