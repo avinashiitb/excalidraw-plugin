@@ -1,6 +1,6 @@
 {
   "name": "excalidraw-plugin",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "homepage": "./",
   "dependencies": {
@@ -22,6 +22,7 @@
   "scripts": {
     "start": "craco start",
     "build": "craco build",
+    "package": "mkdir -p release && zip -r release/excalidraw-plugin-1.0.0.zip manifest.json build/",
     "test": "craco test",
     "eject": "react-scripts eject"
   },
