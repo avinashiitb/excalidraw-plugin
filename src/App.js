@@ -9,6 +9,7 @@ function App() {
   const [excalidrawAPI, setExcalidrawAPI] = useState(null);
   const [lastEdited, setLastEdited] = useState(Date.now());
   const [fileName, setFileName] = useState("Untitled");
+  const [breadcrumbs, setBreadcrumbs] = useState([]);
   const [content, setContent] = useState(null);
   const [isContentLoading, setIsContentLoading] = useState(true);
 
@@ -28,6 +29,18 @@ function App() {
         if (data) {
           setFileName(data.title || "Untitled");
           setLastEdited(data.lastEdited || Date.now());
+        }
+        // Fetch breadcrumb path
+        if (window.pluginAPI.getNestedPath) {
+          window.pluginAPI.getNestedPath({ fileId }).then((result) => {
+            if (result) {
+              const segs = [
+                ...result.folders.map((f) => ({ label: f.name, isFile: false })),
+                ...(result.file ? [{ label: result.file.title, isFile: true }] : []),
+              ];
+              setBreadcrumbs(segs);
+            }
+          }).catch(() => {});
         }
       } catch (error) {
         console.error("Error fetching file details:", error);
@@ -143,6 +156,7 @@ function App() {
         lastEdited={lastEdited}
         excalidrawAPI={excalidrawAPI}
         fileData={content}
+        breadcrumbs={breadcrumbs}
         onRename={async (newName) => {
           try {
             await window.pluginAPI.updateFileName(fileId, newName);

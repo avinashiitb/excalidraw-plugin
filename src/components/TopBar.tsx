@@ -1,9 +1,12 @@
 import React, { useState } from "react";
-import AccessTimeFilledIcon from "@mui/icons-material/AccessTimeFilled";
-import EditIcon from "@mui/icons-material/Edit";
 import moment from "moment";
 import ExcalidrawMenu from "./ExcalidrawMenu.tsx";
 import ExportModal from "./ExportModal.tsx";
+
+interface BreadcrumbSegment {
+  label: string;
+  isFile?: boolean;
+}
 
 interface Props {
   fileId: string;
@@ -12,6 +15,7 @@ interface Props {
   excalidrawAPI: any;
   fileData: any;
   onRename: (newName: string) => void;
+  breadcrumbs?: BreadcrumbSegment[];
 }
 
 const TopBar: React.FC<Props> = ({
@@ -21,10 +25,9 @@ const TopBar: React.FC<Props> = ({
   excalidrawAPI,
   fileData,
   onRename,
+  breadcrumbs = [],
 }) => {
   const [showExportModal, setShowExportModal] = useState(false);
-  const [isEditingName, setIsEditingName] = useState(false);
-  const [tempName, setTempName] = useState(fileName);
 
   const handleLoad = () => {
     if (!excalidrawAPI) return;
@@ -37,17 +40,12 @@ const TopBar: React.FC<Props> = ({
       try {
         const text = await file.text();
         const data = JSON.parse(text);
-
-        // Sanitize appState: Excalidraw expects collaborators to be a Map
         const sanitizedAppState = {
           ...data.appState,
           collaborators: new Map(),
           isLoading: false,
         };
-
-        // Handle case where data might be just elements or a full export
         const elements = Array.isArray(data) ? data : data.elements || [];
-
         excalidrawAPI.updateScene({
           elements,
           appState: sanitizedAppState,
@@ -68,9 +66,7 @@ const TopBar: React.FC<Props> = ({
     const files = excalidrawAPI.getFiles();
     const exportData = { elements, appState, files };
     const finalJson = JSON.stringify(exportData, null, 2);
-    const blob = new Blob([finalJson], {
-      type: "application/json",
-    });
+    const blob = new Blob([finalJson], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -84,26 +80,17 @@ const TopBar: React.FC<Props> = ({
     const elements = excalidrawAPI.getSceneElements();
     const appState = excalidrawAPI.getAppState();
     const files = excalidrawAPI.getFiles();
-
     const exportData = {
       _id: fileData?._id || "",
       version: 1,
       time: Date.now(),
       parent_file: fileId,
-      blocks: [
-        {
-          type: "excalidraw",
-          data: { elements, appState, files },
-        },
-      ],
+      blocks: [{ type: "excalidraw", data: { elements, appState, files } }],
       createdAt: fileData?.createdAt || Date.now(),
       updatedAt: fileData?.updatedAt || Date.now(),
       fileType: "excalidraw-plugin",
     };
-
-    const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-      type: "application/json",
-    });
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -124,12 +111,10 @@ const TopBar: React.FC<Props> = ({
     });
   };
 
-  const submitRename = () => {
-    if (tempName.trim() && tempName !== fileName) {
-      onRename(tempName);
-    }
-    setIsEditingName(false);
-  };
+  // Build display segments
+  const displaySegments: BreadcrumbSegment[] = breadcrumbs.length > 0
+    ? breadcrumbs
+    : [{ label: fileName || "Untitled", isFile: true }];
 
   return (
     <header
@@ -137,89 +122,85 @@ const TopBar: React.FC<Props> = ({
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        padding: "0rem 0rem 0rem 1.5rem",
-        backgroundColor: "white",
-        borderBottom: "1px solid #e5e7eb",
-        boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+        padding: "0 16px",
+        backgroundColor: "var(--bg-primary, #ffffff)",
+        borderBottom: "1px solid var(--divider-light, #e5e7eb)",
         zIndex: 10,
-        height: "64px",
+        height: "40px",
+        flexShrink: 0,
+        userSelect: "none",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-        {isEditingName ? (
-          <input
-            autoFocus
-            value={tempName}
-            onChange={(e) => setTempName(e.target.value)}
-            onBlur={submitRename}
-            onKeyDown={(e) => e.key === "Enter" && submitRename()}
-            style={{
-              fontSize: "1.125rem",
-              fontWeight: 600,
-              color: "#111827",
-              border: "1px solid #6965db",
-              borderRadius: "4px",
-              padding: "2px 8px",
-              outline: "none",
-            }}
-          />
-        ) : (
-          <h1
-            style={{
-              fontSize: "1.125rem",
-              fontWeight: 600,
-              color: "#111827",
-              margin: 0,
-              cursor: "pointer",
-            }}
-            onClick={() => {
-              setTempName(fileName);
-              setIsEditingName(true);
-            }}
-          >
-            {fileName}
-          </h1>
-        )}
-        <button
-          style={{
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            color: "#9ca3af",
-            padding: "4px",
-            display: "flex",
-            alignItems: "center",
-            borderRadius: "4px",
-          }}
-          onClick={() => {
-            setTempName(fileName);
-            setIsEditingName(true);
-          }}
-          onMouseEnter={(e) =>
-            (e.currentTarget.style.backgroundColor = "#f3f4f6")
-          }
-          onMouseLeave={(e) =>
-            (e.currentTarget.style.backgroundColor = "transparent")
-          }
-        >
-          <EditIcon style={{ fontSize: "1rem" }} />
-        </button>
-        <div
+      {/* LEFT: Breadcrumb */}
+      <div style={{ display: "flex", alignItems: "center", minWidth: 0 }}>
+        <nav
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "4px",
-            fontSize: "0.875rem",
-            color: "#6b7280",
-            marginLeft: "8px",
+            gap: 0,
+            fontSize: 12,
+            color: "var(--text-secondaryLight, #9ca3af)",
+            overflow: "visible",
+            flexWrap: "nowrap",
+          }}
+          aria-label="file path"
+        >
+          <i className="fa-solid fa-folder" style={{ marginRight: 6, fontSize: 11, opacity: 0.7, color: "var(--text-secondaryLight, #9ca3af)" }}></i>
+          {displaySegments.map((seg, idx) => (
+            <React.Fragment key={idx}>
+              {!seg.isFile && (
+                <>
+                  <span
+                    style={{
+                      whiteSpace: "nowrap",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      fontSize: 12,
+                      fontWeight: 500,
+                      color: "var(--text-secondaryLight, #9ca3af)",
+                      cursor: "default",
+                    }}
+                    title={seg.label}
+                  >
+                    {seg.label}
+                  </span>
+                  <span style={{ color: "var(--text-secondaryLight, #9ca3af)", opacity: 0.5, margin: "0 4px", fontSize: 13, userSelect: "none" }}>›</span>
+                </>
+              )}
+              {seg.isFile && (
+                <span
+                  style={{
+                    whiteSpace: "nowrap",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: "var(--text-primary, #111827)",
+                    cursor: "default",
+                  }}
+                  title={seg.label}
+                >
+                  {seg.label}
+                </span>
+              )}
+            </React.Fragment>
+          ))}
+        </nav>
+
+        {/* Last edited timestamp */}
+        <span
+          style={{
+            marginLeft: 16,
+            fontSize: 11,
+            color: "var(--text-secondaryLight, #9ca3af)",
+            whiteSpace: "nowrap",
+            flexShrink: 0,
           }}
         >
-          <AccessTimeFilledIcon style={{ fontSize: "0.9rem" }} />
-          <span>Last edited {moment(lastEdited).fromNow()}</span>
-        </div>
+          Last edited {moment(lastEdited).fromNow()}
+        </span>
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+      {/* RIGHT: Menu */}
+      <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
         <ExcalidrawMenu
           excalidrawAPI={excalidrawAPI}
           onExportClick={() => setShowExportModal(true)}
@@ -242,3 +223,4 @@ const TopBar: React.FC<Props> = ({
 };
 
 export default TopBar;
+
